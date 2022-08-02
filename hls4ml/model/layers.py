@@ -1148,6 +1148,21 @@ class GarNetStack(GarNet):
 
         self._output_features = self.attributes['n_out_features'][-1]
 
+class BayesianDropout(Layer):
+    _expected_attributes = [
+        Attribute('n_in'),
+        # Attribute('activation', value_type=str),
+        #Attribute('table_size', default=1024),
+        #TypeAttribute('table')
+    ]
+
+    def initialize(self):
+        inp = self.get_input_variable()
+        shape = inp.shape
+        dims = inp.dim_names
+        self.add_output_variable(shape, dims)
+        self.set_attr('n_in', self.get_input_variable().size())
+
 layer_map = {
     'Input'                  : Input,
     'InputLayer'             : Input,
@@ -1200,6 +1215,8 @@ layer_map = {
     'GarNetStack'            : GarNetStack,
     # TensorFlow-specific layers:
     'BiasAdd'                : BiasAdd,
+    # Dropout layer for Bayesian conversion
+    'BayesianDropout'        : BayesianDropout, 
 }
 
 def register_layer(name, clazz):
