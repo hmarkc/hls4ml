@@ -20,9 +20,11 @@
 #ifndef NNET_DROPOUT_H_
 #define NNET_DROPOUT_H_
 
-#include <cmath>
 #include "ap_fixed.h"
 #include "nnet_common.h"
+#include <cmath>
+#include <random>
+
 
 namespace nnet {
 
@@ -43,33 +45,17 @@ struct dropout_config
 };
 
 // *************************************************
-//       LINEAR Activation -- See Issue 53
+//       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
 void  dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
 {
     #pragma HLS PIPELINE
 
-    for (int ii=0; ii<CONFIG_T::n_in; ii++) {
-        res[ii] = data[ii];
-    }
-}
-
-
-
-// *************************************************
-//       RELU Activation
-// *************************************************
-template<class data_T, class res_T, typename CONFIG_T>
-void  relu_dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
-{
-    #pragma HLS PIPELINE
-
-    data_T datareg;
-    for (int ii=0; ii<CONFIG_T::n_in; ii++) {
-        datareg = data[ii];
-        if (datareg > 0) res[ii] = datareg;
-        else res[ii] = 0;
+  std::default_random_engine generator(time(0));
+  std::binomial_distribution<int> distribution(1, 0.9);
+  for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
+    res[ii] = data[ii] * distribution(generator);
     }
 }
 }
