@@ -1151,7 +1151,7 @@ class GarNetStack(GarNet):
 class BayesianDropout(Layer):
     _expected_attributes = [
         Attribute('n_in'),
-        # Attribute('activation', value_type=str),
+        Attribute('drop_rate', value_type=float, default=0.0),
         #Attribute('table_size', default=1024),
         #TypeAttribute('table')
     ]
@@ -1162,6 +1162,7 @@ class BayesianDropout(Layer):
         dims = inp.dim_names
         self.add_output_variable(shape, dims)
         self.set_attr('n_in', self.get_input_variable().size())
+        self.set_attr('drop_rate', self.get_attr('drop_rate'))
 
 layer_map = {
     'Input'                  : Input,

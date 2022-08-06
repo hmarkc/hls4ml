@@ -8,6 +8,7 @@ from hls4ml.backends.template import LayerConfigTemplate, FunctionCallTemplate
 dropout_config_template = """
 struct config{index} : nnet::dropout_config {{
     static const unsigned n_in = {n_in};
+    static constexpr float drop_rate = {drop_rate};
 }};\n"""
 
 dropout_function_template = 'nnet::dropout<{input_t}, {output_t}, {config}>({input}, {output});'

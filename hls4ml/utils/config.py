@@ -273,7 +273,7 @@ def config_from_keras_model(model, granularity='model', default_precision='ap_fi
 
         else:
             layer_config['Precision'] = default_precision
-        
+            
         return layer_config
 
     config = {}
