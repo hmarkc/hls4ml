@@ -45,7 +45,6 @@ class HLSConfig(object):
 
         self._parse_hls_config()
         self._validate_hls_config()
-        print(self.config)
 
     def get_config_value(self, key, default=None):
         return self.config.get(key, default)

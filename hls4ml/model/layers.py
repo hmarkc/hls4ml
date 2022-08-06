@@ -1152,8 +1152,6 @@ class BayesianDropout(Layer):
     _expected_attributes = [
         Attribute('n_in'),
         Attribute('drop_rate', value_type=float, default=0.0),
-        #Attribute('table_size', default=1024),
-        #TypeAttribute('table')
     ]
 
     def initialize(self):

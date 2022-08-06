@@ -237,8 +237,6 @@ def keras_to_hls(config):
     else:
         raise ValueError('No model found in config file.')
 
-    #print(model_arch)
-
     #Define layers to skip for conversion to HLS
     skip_layers = ['Dropout']
     # Activation layers
