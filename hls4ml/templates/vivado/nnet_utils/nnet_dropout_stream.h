@@ -38,13 +38,15 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res) {
     LinearActLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
         #pragma HLS PIPELINE
 
+        std::default_random_engine generator(time(0));
+        std::binomial_distribution<int> distribution(1, 1 - CONFIG_T::drop_rate);
         data_T in_data = data.read();
         res_T out_data;
         #pragma HLS DATA_PACK variable=out_data
 
         LinearPackLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
-            out_data[j] = in_data[j];
+            out_data[j] = in_data[j] * distribution(generator);
         }
 
         res.write(out_data);
