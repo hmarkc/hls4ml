@@ -52,10 +52,12 @@ void  dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
 {
     #pragma HLS PIPELINE
 
+  float keep_rate = 1 - CONFIG_T::drop_rate;
   std::default_random_engine generator(time(0));
-  std::binomial_distribution<int> distribution(1, 1 - CONFIG_T::drop_rate);
+  std::binomial_distribution<int> distribution(1, keep_rate);
   for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
-    res[ii] = data[ii] * distribution(generator);
+    float temp = data[ii] * distribution(generator);
+    res[ii] = temp * keep_rate;
     }
 }
 }
