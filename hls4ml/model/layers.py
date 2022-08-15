@@ -1152,6 +1152,7 @@ class BayesianDropout(Layer):
     _expected_attributes = [
         Attribute('n_in'),
         Attribute('drop_rate', value_type=float, default=0.0),
+        Attribute('seed', value_type=int, default=0) 
     ]
 
     def initialize(self):
@@ -1161,6 +1162,7 @@ class BayesianDropout(Layer):
         self.add_output_variable(shape, dims)
         self.set_attr('n_in', self.get_input_variable().size())
         self.set_attr('drop_rate', self.get_attr('drop_rate'))
+        self.set_attr('seed', self.get_attr('seed'))
 
 layer_map = {
     'Input'                  : Input,

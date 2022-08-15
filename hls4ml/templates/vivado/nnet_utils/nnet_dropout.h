@@ -23,8 +23,8 @@
 #include "ap_fixed.h"
 #include "nnet_common.h"
 #include <cmath>
+#include <stdint.h>
 #include <random>
-
 
 namespace nnet {
 
@@ -44,6 +44,11 @@ struct dropout_config
     typedef ap_fixed<18,8> table_t;
 };
 
+int bernouli_distribution(float p, std::default_random_engine generator) {
+  int res = ((double)generator() / (double)generator.max()) < p ? 1 : 0;
+  return res;
+}
+
 // *************************************************
 //       Bayesian Dropout
 // *************************************************
@@ -52,13 +57,12 @@ void  dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
 {
     #pragma HLS PIPELINE
 
+  static std::default_random_engine generator(CONFIG_T::seed);
   float keep_rate = 1 - CONFIG_T::drop_rate;
-  std::default_random_engine generator(time(0));
-  std::binomial_distribution<int> distribution(1, keep_rate);
   for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
-    float temp = data[ii] * distribution(generator);
+    float temp = data[ii] * nnet::bernouli_distribution(keep_rate, generator);
     res[ii] = temp * keep_rate;
-    }
+  }
 }
 }
 

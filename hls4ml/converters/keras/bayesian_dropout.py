@@ -9,5 +9,6 @@ def parse_bayesian_dropout_layer(keras_layer, input_names, input_shapes, data_re
 
     layer = parse_default_keras_layer(keras_layer, input_names)
     layer['drop_rate'] = keras_layer['config']['drop_rate']
+    layer['seed'] = keras_layer['config']['seed']
     
     return layer, [shape for shape in input_shapes[0]]
