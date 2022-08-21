@@ -60,7 +60,8 @@ void  dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
   static std::default_random_engine generator(CONFIG_T::seed);
   data_T keep_rate = 1 - CONFIG_T::drop_rate;
   for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
-    data_T temp = nnet::bernouli_distribution(keep_rate, generator) ? (float)data[ii] : 0.0;
+    data_T zero = {};
+    data_T temp = nnet::bernouli_distribution(keep_rate, generator) ? (float)data[ii] : zero;
     res[ii] = temp * keep_rate;
   }
 }
