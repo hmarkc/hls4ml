@@ -33,21 +33,43 @@ namespace nnet {
 // *************************************************
 //       Bayesian Dropout
 // *************************************************
+// template<class data_T, class res_T, typename CONFIG_T>
+// void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res) {
+//     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
+//         #pragma HLS PIPELINE
+
+//         static std::default_random_engine generator(CONFIG_T::seed);
+//         float keep_rate = 1 - CONFIG_T::drop_rate; 
+//         data_T in_data = data.read();
+//         res_T out_data;
+//         #pragma HLS DATA_PACK variable=out_data
+
+//         DropoutPackLoop: for (int j = 0; j < res_T::size; j++) {
+//             #pragma HLS UNROLL
+//             float temp = in_data[j] *
+//                          nnet::bernouli_distribution(keep_rate, generator);
+//             out_data[j] = temp * keep_rate;
+//         }
+
+//         res.write(out_data);
+//     }
+// }
 template<class data_T, class res_T, typename CONFIG_T>
 void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res) {
+    static std::default_random_engine generator(CONFIG_T::seed);
+    typename data_T::value_type keep_rate = 1 - CONFIG_T::drop_rate;
     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
         #pragma HLS PIPELINE
-
-        static std::default_random_engine generator(CONFIG_T::seed);
-        float keep_rate = 1 - CONFIG_T::drop_rate; 
         data_T in_data = data.read();
         res_T out_data;
         #pragma HLS DATA_PACK variable=out_data
 
         DropoutPackLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
-            float temp = in_data[j] *
-                         nnet::bernouli_distribution(keep_rate, generator);
+            typename data_T::value_type zero = {}; 
+            typename data_T::value_type temp =
+                nnet::bernouli_distribution(keep_rate, generator) ? in_data[j]
+                                                                  : zero;
             out_data[j] = temp * keep_rate;
         }
 
