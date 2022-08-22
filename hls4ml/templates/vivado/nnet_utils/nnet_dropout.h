@@ -51,7 +51,7 @@ void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in], int seed)
 {
     #pragma HLS PIPELINE
 
-  static std::default_random_engine generator(10000000);
+  static std::default_random_engine generator(seed);
   data_T keep_rate = 1 - CONFIG_T::drop_rate;
   for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
     data_T zero = {};

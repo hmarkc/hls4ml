@@ -35,7 +35,7 @@ namespace nnet {
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
 void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
-  static std::default_random_engine generator(0);
+  static std::default_random_engine generator(seed);
   typename data_T::value_type keep_rate = 1 - CONFIG_T::drop_rate;
     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
         #pragma HLS PIPELINE

@@ -123,6 +123,8 @@ class VivadoWriter(Writer):
                 newline = ''
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str
+                if model.config.is_Bayes():
+                    newline += ',\n' + indent + 'int seed'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
@@ -227,6 +229,8 @@ class VivadoWriter(Writer):
                 newline = ''
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str
+                if model.config.is_Bayes():
+                    newline += ',\n' + indent + 'int seed = 0'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
