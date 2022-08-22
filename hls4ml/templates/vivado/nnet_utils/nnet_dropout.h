@@ -34,15 +34,9 @@ struct dropout_config
     // IO size
     static const unsigned n_in = 10;
 
-    // Internal info
-    static const unsigned table_size = 1024;
-
     // Resource reuse info
     static const unsigned io_type = io_parallel;
     static const unsigned reuse_factor = 1;
-
-    // Internal data type definitions
-    typedef ap_fixed<18,8> table_t;
 };
 
 bool bernouli_distribution(float p, std::default_random_engine generator) {
@@ -53,7 +47,7 @@ bool bernouli_distribution(float p, std::default_random_engine generator) {
 //       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
-void  dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
+void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
 {
     #pragma HLS PIPELINE
 
@@ -61,7 +55,7 @@ void  dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
   data_T keep_rate = 1 - CONFIG_T::drop_rate;
   for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
     data_T zero = {};
-    data_T temp = nnet::bernouli_distribution(keep_rate, generator) ? (float)data[ii] : zero;
+    data_T temp = nnet::bernouli_distribution(keep_rate, generator) ? data[ii] : zero;
     res[ii] = temp * keep_rate;
   }
 }
