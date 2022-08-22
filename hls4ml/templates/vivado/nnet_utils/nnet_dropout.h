@@ -39,7 +39,7 @@ struct dropout_config
     static const unsigned reuse_factor = 1;
 };
 
-bool bernouli_distribution(float p, std::default_random_engine generator) {
+bool bernouli_distribution(float p, std::default_random_engine& generator) {
   return ((double)generator() / (double)generator.max()) < p;
 }
 
@@ -47,11 +47,11 @@ bool bernouli_distribution(float p, std::default_random_engine generator) {
 //       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
-void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
+void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in], int seed)
 {
     #pragma HLS PIPELINE
 
-  static std::default_random_engine generator(CONFIG_T::seed);
+  static std::default_random_engine generator(10000000);
   data_T keep_rate = 1 - CONFIG_T::drop_rate;
   for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
     data_T zero = {};

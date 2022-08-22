@@ -34,9 +34,9 @@ namespace nnet {
 //       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
-void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res) {
-    static std::default_random_engine generator(CONFIG_T::seed);
-    typename data_T::value_type keep_rate = 1 - CONFIG_T::drop_rate;
+void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
+  static std::default_random_engine generator(0);
+  typename data_T::value_type keep_rate = 1 - CONFIG_T::drop_rate;
     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
         #pragma HLS PIPELINE
         data_T in_data = data.read();
