@@ -39,10 +39,6 @@ struct dropout_config
     static const unsigned reuse_factor = 1;
 };
 
-bool bernouli_distribution(float p, std::default_random_engine& generator) {
-  return ((double)generator() / (double)generator.max()) < p;
-}
-
 // *************************************************
 //       Bayesian Dropout
 // *************************************************
@@ -53,9 +49,14 @@ void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in], int seed)
 
   static std::default_random_engine generator(seed);
   data_T keep_rate = 1 - CONFIG_T::drop_rate;
-  for (int ii = 0; ii < CONFIG_T::n_in; ii++) {
+  data_T max = generator.max(); 
+  bool random_array[CONFIG_T::n_in];
+    RandomNumberLoop: for (int i = 0; i < CONFIG_T::n_in; i++) {
+      random_array[i] = ((data_T)generator() / max) < keep_rate;
+    }
+  for (int ii = 0; ii < CONFIG_T::n_in; ii++) { 
     data_T zero = {};
-    data_T temp = nnet::bernouli_distribution(keep_rate, generator) ? data[ii] : zero;
+    data_T temp = random_array[ii] ? data[ii] : zero;
     res[ii] = temp * keep_rate;
   }
 }

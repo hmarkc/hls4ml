@@ -35,20 +35,26 @@ namespace nnet {
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
 void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
-  static std::default_random_engine generator(seed);
+    #pragma HLS pipeline
+    
+  static std::minstd_rand generator(seed);
   typename data_T::value_type keep_rate = 1 - CONFIG_T::drop_rate;
+  typename data_T::value_type max = generator.max(); 
+  bool random_array[CONFIG_T::n_in];
+    RandomNumberLoop: for (int i = 0; i < CONFIG_T::n_in; i++) {
+        random_array[i] =
+            ((typename data_T::value_type)generator() / max) < keep_rate;
+    }
     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
-        #pragma HLS PIPELINE
         data_T in_data = data.read();
         res_T out_data;
         #pragma HLS DATA_PACK variable=out_data
 
         DropoutPackLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
-            typename data_T::value_type zero = {}; 
+            typename data_T::value_type zero = {};
             typename data_T::value_type temp =
-                nnet::bernouli_distribution(keep_rate, generator) ? in_data[j]
-                                                                  : zero;
+                random_array[i * res_T::size + j] ? in_data[j] : zero;
             out_data[j] = temp * keep_rate;
         }
 
