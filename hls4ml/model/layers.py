@@ -727,6 +727,8 @@ class BatchNormalization(Layer):
         self.add_output_variable(shape, dims)
 
         gamma = self.model.get_weights_data(self.name, 'gamma')
+        if gamma is None:
+            gamma = 1
         beta = self.model.get_weights_data(self.name, 'beta')
         mean = self.model.get_weights_data(self.name, 'moving_mean')
         var = self.model.get_weights_data(self.name, 'moving_variance')
