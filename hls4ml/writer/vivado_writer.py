@@ -230,7 +230,7 @@ class VivadoWriter(Writer):
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str
                 if model.config.is_Bayes():
-                    newline += ',\n' + indent + 'int seed = 0'
+                    newline += ',\n' + indent + 'int seed'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
@@ -475,11 +475,12 @@ class VivadoWriter(Writer):
                 newline += '\n'
 
                 input_vars = ','.join([i.name + '_ap' for i in model_inputs])
+                seed_var = '0' if model.config.is_Bayes() else None 
                 bram_vars   =','.join([b.name for b in model_brams])
                 output_vars = ','.join([o.name + '_ap' for o in model_outputs])
 
                 # Concatenate the input, output, and bram variables. Filter out empty/null values
-                all_vars = ','.join(filter(None, [input_vars, output_vars, bram_vars]))
+                all_vars = ','.join(filter(None, [input_vars, output_vars, seed_var, bram_vars]))
 
                 top_level = indent + '{}({});\n'.format(model.config.get_project_name(), all_vars)
                 newline += top_level
