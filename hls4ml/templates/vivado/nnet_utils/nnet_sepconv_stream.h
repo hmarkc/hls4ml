@@ -144,7 +144,7 @@ void pointwise_mult_buffer(
     #pragma HLS INLINE
 
     typename data_T::value_type data[CONFIG_T::n_chan];
-    #pragma HLS ARRAY_PARTITION variable=data complete
+    // #pragma HLS ARRAY_PARTITION variable=data complete
 
     typename res_T::value_type res[CONFIG_T::n_filt];
     #pragma HLS ARRAY_PARTITION variable=res complete
