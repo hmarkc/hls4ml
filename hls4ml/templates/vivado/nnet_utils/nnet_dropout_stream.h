@@ -48,10 +48,11 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
 
         DropoutPackLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
-            typename data_T::value_type zero = {};
-            typename data_T::value_type temp =
-                ((typename data_T::value_type)generator() / max) < keep_rate
-                    ? in_data[j] : zero;
+            // typename data_T::value_type zero = {};
+            // typename data_T::value_type temp =
+            //     ((typename data_T::value_type)generator() / max) < keep_rate
+            //         ? in_data[j] : zero;
+            typename data_T::value_type temp = in_data[i]; 
             out_data[j] = temp * keep_rate;
         }
 
