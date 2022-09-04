@@ -36,7 +36,7 @@ namespace nnet {
 template<class data_T, class res_T, typename CONFIG_T>
 void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
 
-  static std::minstd_rand generator(seed);
+  std::minstd_rand generator(seed);
   typename data_T::value_type keep_rate = 1 - CONFIG_T::drop_rate;
   typename data_T::value_type max = generator.max(); 
     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
