@@ -72,8 +72,8 @@ void dense_resource_rf_leq_nin(
         MultLoop:
         for (int im = 0; im < block_factor; im++) {
             #pragma HLS UNROLL
-            CONFIG_T::accum_t product; 
-            #pragma HLS RESOURCE variable=tmpmult[im] core=DSP48 
+            typename CONFIG_T::accum_t product; 
+            #pragma HLS RESOURCE variable=product core=DSP48
             product = static_cast<typename CONFIG_T::accum_t>(
               CONFIG_T::template product<data_T, typename CONFIG_T::weight_t>::product(data[in_index], weights[w_index]));
             acc[out_index] += product;
@@ -160,7 +160,7 @@ void dense_resource_rf_gt_nin_rem0(
         MultLoop:
         for (int im = 0; im < block_factor; im++) {
             #pragma HLS UNROLL
-            CONFIG_T::accum_t product;
+            typename CONFIG_T::accum_t product;
             #pragma HLS RESOURCE variable=product core=DSP48
             product = static_cast<typename CONFIG_T::accum_t>(
               CONFIG_T::template product<data_T, typename CONFIG_T::weight_t>::product(data[in_index], weights[w_index]));
