@@ -75,7 +75,9 @@ class mult : public Product{
     {
         // 'Normal' product
         #pragma HLS INLINE
-        return a * w;
+        #pragma HLS RESOURCE variable=c core=DSP48 
+        auto c = a * w;
+        return c;
     }
     static void limit(unsigned multiplier_limit){
         #pragma HLS INLINE
