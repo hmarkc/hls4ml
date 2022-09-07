@@ -76,7 +76,7 @@ class mult : public Product{
         // 'Normal' product
         #pragma HLS INLINE
         x_T c;
-        #pragma HLS RESOURCE variable=c core=DSP48 
+        #pragma HLS RESOURCE variable=c core=Mul  
         c = a * w;
         return c;
     }
