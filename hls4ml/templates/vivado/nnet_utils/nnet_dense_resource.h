@@ -52,7 +52,7 @@ void dense_resource_rf_leq_nin(
     #pragma HLS ARRAY_PARTITION variable=biases complete
 
     typename CONFIG_T::accum_t acc[CONFIG_T::n_out];
-    // #pragma HLS ARRAY_PARTITION variable=acc complete
+    #pragma HLS ARRAY_PARTITION variable=acc complete
 
     InitAccum:
     for (int iacc = 0; iacc < nout; iacc++) {
@@ -128,7 +128,7 @@ void dense_resource_rf_gt_nin_rem0(
     #pragma HLS ARRAY_PARTITION variable=biases complete
 
     typename CONFIG_T::accum_t acc[CONFIG_T::n_out];
-    // // #pragma HLS ARRAY_PARTITION variable=acc complete
+    #pragma HLS ARRAY_PARTITION variable=acc complete
 
     InitAccum:
     for (int iacc = 0; iacc < nout; iacc++) {
@@ -212,7 +212,7 @@ void dense_resource_rf_gt_nin(
     #pragma HLS ARRAY_PARTITION variable=biases complete
 
     typename CONFIG_T::accum_t acc[CONFIG_T::n_out];
-    // #pragma HLS ARRAY_PARTITION variable=acc complete
+    #pragma HLS ARRAY_PARTITION variable=acc complete
 
     InitAccum:
     for (int iacc = 0; iacc < nout; iacc++) {

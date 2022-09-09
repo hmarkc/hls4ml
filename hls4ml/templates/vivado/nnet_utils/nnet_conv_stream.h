@@ -257,7 +257,7 @@ void compute_output_buffer_2d(
     static int sY = 0; // Stride Y
 
     static typename data_T::value_type kernel_data[CONFIG_T::filt_height * CONFIG_T::filt_width * CONFIG_T::n_chan];
-    // #pragma HLS ARRAY_PARTITION variable=kernel_data complete
+    #pragma HLS ARRAY_PARTITION variable=kernel_data complete
 
     typename res_T::value_type res_out[CONFIG_T::n_filt];
     #pragma HLS ARRAY_PARTITION variable=res_out complete dim = 0
@@ -327,7 +327,7 @@ void compute_output_buffer_1d(
     static int sX = 0; // stride counter
 
     static typename data_T::value_type kernel_data[CONFIG_T::filt_width * CONFIG_T::n_chan];
-    // #pragma HLS ARRAY_PARTITION variable=kernel_data complete
+    #pragma HLS ARRAY_PARTITION variable=kernel_data complete
 
     typename res_T::value_type res_out[CONFIG_T::n_filt];
     #pragma HLS ARRAY_PARTITION variable=res_out complete dim = 0
