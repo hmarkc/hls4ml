@@ -72,15 +72,11 @@ void dense_resource_rf_leq_nin(
         MultLoop:
         for (int im = 0; im < block_factor; im++) {
             #pragma HLS UNROLL
-            typename CONFIG_T::accum_t product; 
-            // #pragma HLS RESOURCE variable=product core=Mul 
-            // #pragma HLS RESOURCE variable=acc[out_index] core=AddSub_DSP 
-            product = static_cast<typename CONFIG_T::accum_t>(
+            acc[out_index] += static_cast<typename CONFIG_T::accum_t>(
               CONFIG_T::template product<data_T, typename CONFIG_T::weight_t>::product(data[in_index], weights[w_index]));
-            acc[out_index] += product;
 
-                // Increment w_index
-                w_index += rufactor;
+            // Increment w_index
+            w_index += rufactor;
             // Increment in_index
             in_index += rufactor;
             if (in_index >= nin) {
@@ -161,12 +157,8 @@ void dense_resource_rf_gt_nin_rem0(
         MultLoop:
         for (int im = 0; im < block_factor; im++) {
             #pragma HLS UNROLL
-            typename CONFIG_T::accum_t product;
-            // #pragma HLS RESOURCE variable=product core=Mul 
-            // #pragma HLS RESOURCE variable=acc[out_index] core=AddSub_DSP 
-            product = static_cast<typename CONFIG_T::accum_t>(
+            acc[out_index] += static_cast<typename CONFIG_T::accum_t>(
               CONFIG_T::template product<data_T, typename CONFIG_T::weight_t>::product(data[in_index], weights[w_index]));
-            acc[out_index] += product;
 
             w_index += rufactor;
             if (w_index >= CONFIG_T::n_in * CONFIG_T::n_out) break; // check out of bounds
@@ -232,7 +224,6 @@ void dense_resource_rf_gt_nin(
             int w_index = ir + rufactor * im;
             int in_index = w_index % nin;
             if (w_index >= CONFIG_T::n_in*CONFIG_T::n_out) continue; // check out of bounds
-            // #pragma HLS RESOURCE variable=tmpmult[im] core=Mul 
             tmpmult[im] = CONFIG_T::template product<data_T, typename CONFIG_T::weight_t>::product(data[in_index], weights[w_index]);
         }
 
@@ -257,7 +248,6 @@ void dense_resource_rf_gt_nin(
         AccumLoop2:
         for (int im = 0; im < multiplier_limit; im++) {
             #pragma HLS UNROLL
-            // #pragma HLS RESOURCE variable=acc[im] core=AddSub_DSP 
             //int out_index = im/multscale; // This is the general case
             //acc[out_index] += mult[im];
             acc[im] += mult[im]; // If RF > N_IN then multiplier_limit == n_out
