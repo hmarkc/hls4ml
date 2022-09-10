@@ -85,7 +85,7 @@ void pointwise_conv_2d_cl(
     assert(CONFIG_T::filt_height == 1 && CONFIG_T::filt_width == 1);
 
     // #pragma HLS ARRAY_PARTITION variable=weights complete
-    #pragma HLS ARRAY_PARTITION variable=biases complete
+    // #pragma HLS ARRAY_PARTITION variable=biases complete
 
     ReadInputHeight: for (unsigned i_ih = 0; i_ih < CONFIG_T::in_height; i_ih++) {
         ReadInputWidth: for (unsigned i_iw = 0; i_iw < CONFIG_T::in_width / (data_T::size / CONFIG_T::n_chan); i_iw++) {
