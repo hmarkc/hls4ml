@@ -190,7 +190,7 @@ void compute_depthwise_output_buffer_1d(
     static int sX = 0;
 
     static typename data_T::value_type kernel_data[CONFIG_T::filt_width * CONFIG_T::n_chan];
-    #pragma HLS ARRAY_PARTITION variable=kernel_data complete
+    #pragma HLS ARRAY_PARTITION variable=kernel_data block factor = CONFIG_T::filt_width
 
     typename res_T::value_type res_out[CONFIG_T::n_chan];
     #pragma HLS ARRAY_PARTITION variable=res_out complete dim = 0
@@ -254,7 +254,7 @@ void compute_depthwise_output_buffer_2d(
     static int sY = 0; // stride Y
 
     static typename data_T::value_type kernel_data[CONFIG_T::filt_height * CONFIG_T::filt_width * CONFIG_T::n_chan];
-    #pragma HLS ARRAY_PARTITION variable=kernel_data complete
+    #pragma HLS ARRAY_PARTITION variable=kernel_data block factor = CONFIG_T::filt_width
 
     typename res_T::value_type res_out[CONFIG_T::n_chan];
     #pragma HLS ARRAY_PARTITION variable=res_out complete dim = 0
