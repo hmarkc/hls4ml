@@ -74,7 +74,7 @@ class mult : public Product{
     static auto product(x_T a, w_T w) -> decltype(a*w)
     {
         // 'Normal' product
-        #pragma HLS INLINE  
+        #pragma HLS INLINE
         return a * w;
     }
     static void limit(unsigned multiplier_limit){

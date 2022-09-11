@@ -50,7 +50,7 @@ void dense_latency(
     // #pragma HLS ARRAY_PARTITION variable=weights complete // remove this line for now, it breaks compression sometimes
     #pragma HLS ARRAY_PARTITION variable=biases complete
     #pragma HLS ARRAY_PARTITION variable=mult complete
-    #pragma HLS ARRAY_PARTITION variable=acc complete
+    // #pragma HLS ARRAY_PARTITION variable=acc complete
 
     int multiplier_limit  = ceil(float(CONFIG_T::n_in*CONFIG_T::n_out) / float(CONFIG_T::reuse_factor)) - floor(float(CONFIG_T::n_zeros) / float(CONFIG_T::reuse_factor));
     CONFIG_T::template product<data_T, typename CONFIG_T::weight_t>::limit(multiplier_limit);
