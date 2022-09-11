@@ -44,7 +44,7 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
 
         data_T in_data = data.read();
         res_T out_data;
-        #pragma HLS DATA_PACK variable=out_data
+//        #pragma HLS DATA_PACK variable=out_data
 
         DropoutPackLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
