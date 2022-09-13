@@ -41,9 +41,10 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
   float keep_rate = 1 - CONFIG_T::drop_rate;
   float max = generator.max();
   bool rand_matrix[CONFIG_T::n_in];
+#pragma HLS DATAFLOW
 RandomNumLoop:
   for (int i = 0; i < CONFIG_T::n_in; i++) {
-#pragma HLS UNROLL
+#pragma HLS pipeline
     rand_matrix[i] = (float)generator() / max < keep_rate;
   }
 
