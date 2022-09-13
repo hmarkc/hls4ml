@@ -78,6 +78,11 @@ class FPGABackend(Backend):
             n_in = layer.get_attr('n_in')
             n_out = layer.get_attr('n_out')
             return n_in, n_out
+        
+        if 'BayesianDropout' in layer.class_name:
+            n_in = layer.get_attr('n_in')
+            n_out = layer.get_attr('n_out')
+            return n_in, n_out
 
         if 'Conv1D' in layer.class_name:
             n_in = layer.get_attr('n_chan') * layer.get_attr('filt_width')
