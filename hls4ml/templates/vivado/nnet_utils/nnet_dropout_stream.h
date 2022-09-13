@@ -37,7 +37,7 @@ namespace nnet {
 template <class data_T, class res_T, typename CONFIG_T>
 void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
 
-  static std::minstd_rand generator(seed);
+  static std::minstd_rand generator(CONFIG_T::seed);
   float keep_rate = 1 - CONFIG_T::drop_rate;
   float max = generator.max();
   bool rand_matrix[CONFIG_T::n_in];
