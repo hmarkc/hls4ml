@@ -28,6 +28,7 @@
 #include "nnet_types.h"
 #include <cmath>
 
+
 namespace nnet {
 
 // *************************************************
@@ -48,7 +49,6 @@ RandomNumLoop:
     rand_matrix[i] = (float)generator() / max < keep_rate;
   }
 
-  int count = 0;
 DropoutLoop:
   for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
 #pragma HLS pipeline
@@ -62,7 +62,7 @@ DropoutLoop:
 #pragma HLS UNROLL
       typename data_T::value_type zero = {};
       typename data_T::value_type temp =
-          rand_matrix[++count] ? in_data[j] : zero;
+          rand_matrix[j] ? in_data[j] : zero;
       out_data[j] = temp * (typename data_T::value_type)keep_rate;
     }
     res.write(out_data);
