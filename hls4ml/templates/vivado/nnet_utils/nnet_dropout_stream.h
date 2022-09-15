@@ -41,7 +41,7 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
   float max = generator.max();
   const int limit = DIV_ROUNDUP(CONFIG_T::n_in, CONFIG_T::reuse_factor);
   bool rand_matrix[CONFIG_T::n_in];
-// #pragma HLS ARRAY_PARTITION variable=rand_matrix block factor=limit
+#pragma HLS ARRAY_PARTITION variable=rand_matrix block factor=limit
 RandomNumLoop:
   for (int i = 0; i < CONFIG_T::n_in; i++) {
 #pragma HLS UNROLL
