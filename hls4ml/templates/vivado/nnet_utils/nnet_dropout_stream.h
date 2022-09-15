@@ -40,11 +40,11 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
   static std::minstd_rand generator(seed);
   float keep_rate = 1 - CONFIG_T::drop_rate;
   float max = generator.max();
-  bool rand_matrix[CONFIG_T::n_in];
+  float rand_matrix[CONFIG_T::n_in];
 RandomNumLoop:
   for (int i = 0; i < CONFIG_T::n_in; i++) {
 #pragma HLS UNROLL
-    rand_matrix[i] = (float)generator() / max < keep_rate;
+    rand_matrix[i] = (float)generator() / max;
   }
 
 DropoutLoop:
@@ -60,7 +60,7 @@ DropoutLoop:
 #pragma HLS UNROLL
       typename data_T::value_type zero = {};
       typename data_T::value_type temp =
-          rand_matrix[j] ? in_data[j] : zero;
+          rand_matrix[j] < keep_rate ? in_data[j] : zero;
       out_data[j] = temp * (typename data_T::value_type)keep_rate;
     }
     res.write(out_data);
