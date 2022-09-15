@@ -39,17 +39,16 @@ void dropout(hls::stream<data_T> &data, hls::stream<res_T> &res, int seed) {
   static std::minstd_rand generator(CONFIG_T::seed);
   float keep_rate = 1 - CONFIG_T::drop_rate;
   float max = generator.max();
-  bool rand_matrix[CONFIG_T::n_in / res_T::size][res_T::size];
-#pragma HLS ARRAY_PARTITION variable=rand_matrix complete dim=0
+  const int limit = DIV_ROUNDUP(CONFIG_T::n_in, CONFIG_T::reuse_factor);
+  bool rand_matrix[CONFIG_T::n_in];
+// #pragma HLS ARRAY_PARTITION variable=rand_matrix block factor=limit
 RandomNumLoop:
-  for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
-#pragma HLS pipeline
-    for (int j = 0; j < res_T::size; j++) {
+  for (int i = 0; i < CONFIG_T::n_in; i++) {
 #pragma HLS UNROLL
-      rand_matrix[i][j] = (float)generator() / max < keep_rate;
-    }
+    rand_matrix[i] = (float)generator() / max < keep_rate;
   }
 
+  int count = 0;
 DropoutLoop:
   for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
 #pragma HLS pipeline
@@ -63,7 +62,7 @@ DropoutLoop:
 #pragma HLS UNROLL
       typename data_T::value_type zero = {};
       typename data_T::value_type temp =
-          rand_matrix[i][j] ? in_data[j] : zero;
+          rand_matrix[++count] ? in_data[j] : zero;
       out_data[j] = temp * (typename data_T::value_type)keep_rate;
     }
     res.write(out_data);
