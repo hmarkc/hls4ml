@@ -125,6 +125,7 @@ class VivadoWriter(Writer):
                 newline += indent + outputs_str
                 if model.config.is_Bayes():
                     newline += ',\n' + indent + 'int seed'
+                    newline += ',\n' + indent + 'int mask_index'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
@@ -231,6 +232,7 @@ class VivadoWriter(Writer):
                 newline += indent + outputs_str
                 if model.config.is_Bayes():
                     newline += ',\n' + indent + 'int seed'
+                    newline += ',\n' + indent + 'int mask_index'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
@@ -295,6 +297,7 @@ class VivadoWriter(Writer):
             elif "//hls-fpga-machine-learning insert layer-config" in line:
                 newline = line
                 for layer in model.get_layers():
+                    print(layer.name, layer.__dict__)
                     config = layer.get_attr('config_cpp', None)
                     if config:
                         newline += '// ' + layer.name + '\n'

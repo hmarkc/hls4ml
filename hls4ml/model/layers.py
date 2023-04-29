@@ -1166,6 +1166,26 @@ class BayesianDropout(Layer):
         self.set_attr('drop_rate', self.get_attr('drop_rate'))
         self.set_attr('seed', self.get_attr('seed'))
 
+class Masksembles(Layer):
+    _expected_attributes = [
+        Attribute('n_in'),
+        Attribute('num_masks', value_type=int, default=4),
+        Attribute('scale', value_type=float, default=1.), 
+
+        WeightAttribute('weight'),
+        TypeAttribute('weight'),
+    ]
+
+    def initialize(self):
+        inp = self.get_input_variable()
+        shape = inp.shape
+        dims = inp.dim_names
+        self.add_output_variable(shape, dims)
+        self.add_weights(quantizer=self.get_attr('weight_quantizer'))
+        self.set_attr('n_in', self.get_input_variable().size())
+        self.set_attr('num_masks', self.get_attr('num_masks'))
+        self.set_attr('scale', self.get_attr('scale'))
+
 layer_map = {
     'Input'                  : Input,
     'InputLayer'             : Input,
@@ -1220,6 +1240,8 @@ layer_map = {
     'BiasAdd'                : BiasAdd,
     # Dropout layer for Bayesian conversion
     'BayesianDropout'        : BayesianDropout, 
+    # Masksembles layer for Bayesian conversion
+    'Masksembles'            : Masksembles
 }
 
 def register_layer(name, clazz):

@@ -668,6 +668,10 @@ class ModelGraph(object):
         curr_dir = os.getcwd()
         os.chdir(self.config.get_output_dir() + '/firmware')
 
+        print('Tracing {} samples'.format(n_samples))
+        print('Tracing {} inputs'.format(n_inputs))
+        print('Tracing {} outputs'.format(n_outputs))
+
         output = []
         if n_samples == 1 and n_inputs == 1:
             x = [x]
