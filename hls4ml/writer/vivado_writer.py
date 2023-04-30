@@ -465,6 +465,9 @@ class VivadoWriter(Writer):
                 newline = ''
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str + '\n'
+                if model.config.is_Bayes():
+                    newline += ',\n' + indent + 'int seed'
+                    newline += ',\n' + indent + 'int mask_index'
             elif '//hls-fpga-machine-learning insert wrapper' in line:
                 dtype = line.split('#', 1)[1].strip()
                 newline = ''
@@ -479,8 +482,8 @@ class VivadoWriter(Writer):
                 newline += '\n'
 
                 input_vars = ','.join([i.name + '_ap' for i in model_inputs])
-                seed_var = '0' if model.config.is_Bayes() else None 
-                n_mask_var = '0' if model.config.is_Bayes() else None 
+                seed_var = 'seed' if model.config.is_Bayes() else None 
+                n_mask_var = 'mask_index' if model.config.is_Bayes() else None 
                 bram_vars   =','.join([b.name for b in model_brams])
                 output_vars = ','.join([o.name + '_ap' for o in model_outputs])
 

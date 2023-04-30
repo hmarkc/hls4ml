@@ -40,6 +40,9 @@ void masksembles(
   typename CONFIG_T::weight_t weights[CONFIG_T::n_in*CONFIG_T::num_masks],
   int mask_index) {
 
+    // std::cout << "mask_index: " << mask_index << std::endl;
+    int mask = mask_index;
+
     Loop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
         #pragma HLS pipeline
 
@@ -47,10 +50,16 @@ void masksembles(
         res_T out_data;
         #pragma HLS DATA_PACK variable=out_data
 
-        PackLoop: for (int j = 0; j < res_T::size; j++) {
+        MaskLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
-            out_data[j] = in_data[j];
+            out_data[j] = (weights[mask * CONFIG_T::n_in + i * res_T::size + j]) ? in_data[j] : (typename data_T::value_type){};
+            // out_data[j] = weights[mask * CONFIG_T::n_in + i * res_T::size + j] * in_data[j];
+            // out_data[j] = in_data[j];
+            // std::cout << weights[1 * CONFIG_T::n_in + i * res_T::size + j] << ", ";
         }
+
+        // std::cout << std::endl;
+
         res.write(out_data);
     }
 }

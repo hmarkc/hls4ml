@@ -685,8 +685,7 @@ class ModelGraph(object):
                     inp = [np.asarray(xj[i]) for xj in x]
                 argtuple = inp
                 argtuple += predictions
-                if seed is not None:
-                    argtuple += [seed]
+                argtuple += [seed]
                 argtuple += [mask_index]
                 argtuple = tuple(argtuple)
                 top_function(*argtuple)
