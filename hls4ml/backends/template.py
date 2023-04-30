@@ -34,11 +34,7 @@ class LayerConfigTemplate(Template):
         else:
             name = layer_class.__name__.lower()
         name += '_config_template'
-        if 'mask' in name:
-            print(name, self.get_attr('config_cpp'))
         super().__init__(name, layer_class, 'config_cpp')
-        if 'mask' in name:
-            print(name, self.get_attr('config_cpp'))
     
     def _default_config_params(self, layer):
         params = {}

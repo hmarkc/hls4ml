@@ -659,7 +659,7 @@ class ModelGraph(object):
         outputs = [self.predict(x, ) for _ in range(nSamples)]
         return sum(outputs) / len(outputs) 
 
-    def predict(self, x, seed=None):
+    def predict(self, x, seed=None, mask_index=0):
         top_function, ctype = self._get_top_function(x)
         n_samples = self._compute_n_samples(x)
         n_inputs = len(self.get_input_variables())
@@ -687,6 +687,7 @@ class ModelGraph(object):
                 argtuple += predictions
                 if seed is not None:
                     argtuple += [seed]
+                argtuple += [mask_index]
                 argtuple = tuple(argtuple)
                 top_function(*argtuple)
                 output.append(predictions)

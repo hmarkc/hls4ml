@@ -37,7 +37,7 @@ template<class data_T, class res_T, typename CONFIG_T>
 void masksembles(
   hls::stream<data_T> &data, 
   hls::stream<res_T> &res, 
-  typename CONFIG_T::weight_t weights[CONFIG_T::n_in*CONFIG_T::n_out],
+  typename CONFIG_T::weight_t weights[CONFIG_T::n_in*CONFIG_T::num_masks],
   int mask_index) {
 
     Loop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {

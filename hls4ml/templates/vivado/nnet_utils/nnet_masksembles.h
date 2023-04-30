@@ -36,7 +36,7 @@ struct masksembles_config
 
     // Layer Sizes
     static const unsigned n_in = 10;
-    static const unsigned n_out = 10;
+    static const unsigned num_masks = 4;
 
     // Resource reuse info 
     static const unsigned reuse_factor = 1;

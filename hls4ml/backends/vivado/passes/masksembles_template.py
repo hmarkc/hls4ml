@@ -11,6 +11,7 @@ struct config{index} : nnet::masksembles_config {{
     static const unsigned io_type = nnet::{iotype};
     static const unsigned reuse_factor = {reuse};
     static const bool store_weights_in_bram = false;
+    static const unsigned num_masks = {num_masks};
     typedef {weight_t.name} weight_t;
 }};\n"""
 
@@ -29,7 +30,7 @@ class MasksemblesConfigTemplate(LayerConfigTemplate):
 
         return self.template.format(**params)
 
-class MasksemblesConfigTemplate(FunctionCallTemplate):
+class MasksemblesFunctionTemplate(FunctionCallTemplate):
     def __init__(self):
         super().__init__(Masksembles, include_header=masksembles_include_list)
         self.template = masksembles_function_template

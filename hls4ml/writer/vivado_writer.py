@@ -297,7 +297,6 @@ class VivadoWriter(Writer):
             elif "//hls-fpga-machine-learning insert layer-config" in line:
                 newline = line
                 for layer in model.get_layers():
-                    print(layer.name, layer.__dict__)
                     config = layer.get_attr('config_cpp', None)
                     if config:
                         newline += '// ' + layer.name + '\n'
@@ -402,10 +401,12 @@ class VivadoWriter(Writer):
 
                 input_vars = ','.join([i.name for i in model_inputs])
                 output_vars = ','.join([o.name for o in model_outputs])
+                seed_var = '0' if model.config.is_Bayes() else None 
+                n_mask_var = '0' if model.config.is_Bayes() else None
                 bram_vars   =','.join([b.name for b in model_brams])
 
                 # Concatenate the input, output, and bram variables. Filter out empty/null values
-                all_vars = ','.join(filter(None, [input_vars, output_vars, bram_vars]))
+                all_vars = ','.join(filter(None, [input_vars, output_vars, seed_var, n_mask_var, bram_vars]))
 
                 top_level = indent + '{}({});\n'.format(model.config.get_project_name(), all_vars)
 
@@ -479,11 +480,12 @@ class VivadoWriter(Writer):
 
                 input_vars = ','.join([i.name + '_ap' for i in model_inputs])
                 seed_var = '0' if model.config.is_Bayes() else None 
+                n_mask_var = '0' if model.config.is_Bayes() else None 
                 bram_vars   =','.join([b.name for b in model_brams])
                 output_vars = ','.join([o.name + '_ap' for o in model_outputs])
 
                 # Concatenate the input, output, and bram variables. Filter out empty/null values
-                all_vars = ','.join(filter(None, [input_vars, output_vars, seed_var, bram_vars]))
+                all_vars = ','.join(filter(None, [input_vars, output_vars, seed_var, n_mask_var, bram_vars]))
 
                 top_level = indent + '{}({});\n'.format(model.config.get_project_name(), all_vars)
                 newline += top_level
