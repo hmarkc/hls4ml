@@ -52,7 +52,8 @@ void masksembles(
 
         MaskLoop: for (int j = 0; j < res_T::size; j++) {
             #pragma HLS UNROLL
-            out_data[j] = (weights[mask * CONFIG_T::n_in + i * res_T::size + j]) ? in_data[j] : (typename data_T::value_type){};
+            typename data_T::value_type zero = {};
+            out_data[j] = (weights[mask * CONFIG_T::n_in + i * res_T::size + j]) ? in_data[j] : zero;
             // out_data[j] = weights[mask * CONFIG_T::n_in + i * res_T::size + j] * in_data[j];
             // out_data[j] = in_data[j];
             // std::cout << weights[1 * CONFIG_T::n_in + i * res_T::size + j] << ", ";
