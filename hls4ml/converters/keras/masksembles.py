@@ -5,7 +5,7 @@ from hls4ml.converters.utils import parse_data_format, compute_padding_1d, compu
 from hls4ml.converters.keras.core import BinaryQuantizer
 
 @keras_handler('Masksembles')
-def parse_masksembles_layer(keras_layer, input_names, input_shapes, data_reader, config):
+def parse_masksembles_layer(keras_layer, input_names, input_shapes, data_reader):
     assert('Masksembles' in keras_layer['class_name'])
 
     layer = parse_default_keras_layer(keras_layer, input_names)

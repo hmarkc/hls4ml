@@ -132,9 +132,8 @@ class VivadoWriter(Writer):
                 newline = ''
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str
-                if model.config.is_Bayes():
-                    newline += ',\n' + indent + 'int seed'
-                    newline += ',\n' + indent + 'int mask_index'
+                newline += ',\n' + indent + 'int seed'
+                newline += ',\n' + indent + 'int mask_index'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
@@ -255,9 +254,8 @@ class VivadoWriter(Writer):
                 newline = ''
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str
-                if model.config.is_Bayes():
-                    newline += ',\n' + indent + 'int seed'
-                    newline += ',\n' + indent + 'int mask_index'
+                newline += ',\n' + indent + 'int seed'
+                newline += ',\n' + indent + 'int mask_index'
                 if len(model_brams) > 0:
                     newline += ',\n' + brams_str
                 newline += '\n'
@@ -456,8 +454,8 @@ class VivadoWriter(Writer):
                 input_vars = ','.join([i.name for i in model_inputs])
                 output_vars = ','.join([o.name for o in model_outputs])
                 bram_vars = ','.join([b.name for b in model_brams])
-                seed_var = '0' if model.config.is_Bayes() else None 
-                n_mask_var = '0' if model.config.is_Bayes() else None
+                seed_var = '0' 
+                n_mask_var = '0' 
 
                 # Concatenate the input, output, and bram variables. Filter out empty/null values
                 all_vars = ','.join(filter(None, [input_vars, output_vars, seed_var, n_mask_var, bram_vars]))
@@ -528,9 +526,8 @@ class VivadoWriter(Writer):
                 newline = ''
                 newline += indent + inputs_str + ',\n'
                 newline += indent + outputs_str + '\n'
-                if model.config.is_Bayes():
-                    newline += ',\n' + indent + 'int seed'
-                    newline += ',\n' + indent + 'int mask_index'
+                newline += ',\n' + indent + 'int seed'
+                newline += ',\n' + indent + 'int mask_index'
             elif '// hls-fpga-machine-learning insert wrapper' in line:
                 dtype = line.split('#', 1)[1].strip()
                 newline = ''
@@ -547,8 +544,8 @@ class VivadoWriter(Writer):
                 newline += '\n'
 
                 input_vars = ','.join([i.name + '_ap' for i in model_inputs])
-                seed_var = 'seed' if model.config.is_Bayes() else None 
-                n_mask_var = 'mask_index' if model.config.is_Bayes() else None
+                seed_var = 'seed'
+                n_mask_var = 'mask_index' 
                 bram_vars = ','.join([b.name for b in model_brams])
                 output_vars = ','.join([o.name + '_ap' for o in model_outputs])
 
