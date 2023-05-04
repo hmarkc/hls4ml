@@ -35,36 +35,48 @@ namespace nnet {
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
 void masksembles(
-  hls::stream<data_T> &data, 
-  hls::stream<res_T> &res, 
+  hls::stream<data_T> &data_stream, 
+  hls::stream<res_T> &res_stream, 
   typename CONFIG_T::weight_t weights[CONFIG_T::n_in*CONFIG_T::num_masks],
   int mask_index) {
 
     // std::cout << "mask_index: " << mask_index << std::endl;
     int mask = mask_index;
 
-    Loop: for (int i = 0; i < CONFIG_T::n_in / res_T::size; i++) {
-        #pragma HLS pipeline
+    typename data_T::value_type data[CONFIG_T::n_in];
+    #pragma HLS ARRAY_PARTITION variable=data complete
 
-        data_T in_data = data.read();
-        res_T out_data;
-        #pragma HLS DATA_PACK variable=out_data
+    typename res_T::value_type res[CONFIG_T::n_in];
+    #pragma HLS ARRAY_PARTITION variable=res complete
 
-        MaskLoop: for (int j = 0; j < res_T::size; j++) {
-            #pragma HLS UNROLL
-            typename data_T::value_type zero = {};
-            typename data_T::value_type temp =
-                (weights[mask * CONFIG_T::n_in + i * res_T::size + j])
-                    ? in_data[j] : zero;
-            out_data[j] = temp; 
-            // out_data[j] = weights[mask * CONFIG_T::n_in + i * res_T::size + j] * in_data[j];
-            // out_data[j] = in_data[j];
-            // std::cout << weights[1 * CONFIG_T::n_in + i * res_T::size + j] << ", ";
+    DataPrepare: for(int i_in = 0; i_in < CONFIG_T::n_in / data_T::size; i_in++) {
+        if (CONFIG_T::n_in / data_T::size > 1) {
+            #pragma HLS PIPELINE
         }
+        data_T data_pack = data_stream.read();
+        DataPack: for (int i_pack = 0; i_pack < data_T::size; i_pack++) {
+            #pragma HLS UNROLL
+            data[i_in * data_T::size + i_pack] = data_pack[i_pack];
+        }
+    }
 
-        // std::cout << std::endl;
+    MaskLoop: for (int i = 0; i < CONFIG_T::n_in; i++) {
+        #pragma HLS UNROLL
+        typename data_T::value_type zero = {};
+        res[i] = (weights[mask * CONFIG_T::n_in + i]) ? data[i] : zero;
+    }
 
-        res.write(out_data);
+    ResWrite: for(unsigned i_out = 0; i_out < CONFIG_T::n_in / res_T::size; i_out++) {
+        if (CONFIG_T::n_in / res_T::size > 1) {
+            #pragma HLS PIPELINE
+        }
+        res_T res_pack;
+        #pragma HLS DATA_PACK variable=res_pack
+        ResPack: for (int i_pack = 0; i_pack < res_T::size; i_pack++) {
+            #pragma HLS UNROLL
+            res_pack[i_pack] = res[i_out * res_T::size + i_pack];
+        }
+        res_stream.write(res_pack);
     }
 }
 }
