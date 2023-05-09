@@ -34,7 +34,7 @@ namespace nnet {
 //       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
-void dropout(hls::stream<data_T> &data_stream, hls::stream<res_T> &res_stream, int seed) {
+void dropout(hls::stream<data_T> &data_stream, hls::stream<res_T> &res_stream, unsigned int seed = 0) {
 
     typename data_T::value_type data[CONFIG_T::n_in];
     #pragma HLS ARRAY_PARTITION variable=data complete

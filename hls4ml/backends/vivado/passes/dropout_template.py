@@ -10,12 +10,11 @@ struct config{index} : nnet::dropout_config {{
     static const unsigned n_in = {n_in};
     static const unsigned io_type = nnet::{iotype};
     static constexpr float drop_rate = {drop_rate};
-    static const unsigned seed = {seed};
     std::default_random_engine eng = std::default_random_engine();
 }};\n"""
 
 # isBayes must be set to True in config!
-dropout_function_template = 'nnet::dropout<{input_t}, {output_t}, {config}>({input}, {output}, seed);'
+dropout_function_template = 'nnet::dropout<{input_t}, {output_t}, {config}>({input}, {output});'
 
 dropout_include_list = ['nnet_utils/nnet_dropout.h', 'nnet_utils/nnet_dropout_stream.h']
 
