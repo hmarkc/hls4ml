@@ -34,7 +34,7 @@ namespace nnet {
 //       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
-void dropout(hls::stream<data_T> &data_stream, hls::stream<res_T> &res_stream, unsigned int seed = 0) {
+void dropout(hls::stream<data_T> &data_stream, hls::stream<res_T> &res_stream) {
 
     typename data_T::value_type data[CONFIG_T::n_in];
     #pragma HLS ARRAY_PARTITION variable=data complete
@@ -53,7 +53,7 @@ void dropout(hls::stream<data_T> &data_stream, hls::stream<res_T> &res_stream, u
         }
     }
 
-    static std::minstd_rand generator(seed);
+    static std::minstd_rand generator(0);
     float keep_rate = 1 - CONFIG_T::drop_rate;
     float max = generator.max();
     DropoutLoop: for (int i = 0; i < CONFIG_T::n_in; i++) {

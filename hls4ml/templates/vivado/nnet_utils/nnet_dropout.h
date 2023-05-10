@@ -43,11 +43,11 @@ struct dropout_config
 //       Bayesian Dropout
 // *************************************************
 template<class data_T, class res_T, typename CONFIG_T>
-void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in], int  = 0)
+void dropout(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
 {
     #pragma HLS PIPELINE
 
-  static std::default_random_engine generator(seed);
+  static std::default_random_engine generator(0);
   data_T keep_rate = 1 - CONFIG_T::drop_rate;
   data_T max = generator.max(); 
   bool random_array[CONFIG_T::n_in];
