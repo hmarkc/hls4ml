@@ -1171,6 +1171,7 @@ class Masksembles(Layer):
         Attribute('n_in'),
         Attribute('num_masks', value_type=int, default=4),
         Attribute('scale', value_type=float, default=1.), 
+        Attribute('n_filt', default=1),
 
         WeightAttribute('weight'),
         TypeAttribute('weight'),
@@ -1185,6 +1186,7 @@ class Masksembles(Layer):
         self.set_attr('n_in', self.get_input_variable().size())
         self.set_attr('num_masks', self.get_attr('num_masks'))
         self.set_attr('scale', self.get_attr('scale'))
+        self.set_attr('n_filt', self.get_attr('n_filt'))
 
 layer_map = {
     'Input'                  : Input,

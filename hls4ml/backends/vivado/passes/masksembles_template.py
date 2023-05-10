@@ -12,6 +12,7 @@ struct config{index} : nnet::masksembles_config {{
     static const unsigned reuse_factor = {reuse};
     static const bool store_weights_in_bram = false;
     static const unsigned num_masks = {num_masks};
+    static const unsigned n_filt = {n_filt};
     typedef {weight_t.name} weight_t;
 }};\n"""
 
