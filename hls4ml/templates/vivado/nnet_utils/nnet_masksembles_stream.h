@@ -40,7 +40,7 @@ void masksembles(
   typename CONFIG_T::weight_t weights[CONFIG_T::n_in*CONFIG_T::num_masks],
   int mask_index) {
 
-    // std::cout << "mask_index: " << mask_index << std::endl;
+    // std::cout << "mask_index: " << mask_index << " N_IN: " << CONFIG_T::n_in << std::endl;
 
     typename data_T::value_type data[CONFIG_T::n_in];
     #pragma HLS ARRAY_PARTITION variable=data complete
@@ -61,14 +61,8 @@ void masksembles(
 
     MaskLoop: for (int i = 0; i < CONFIG_T::n_in; i++) {
         #pragma HLS UNROLL
-        int norm_index;
-        if (CONFIG_T::n_filt==-1) {
-            norm_index = mask_index * CONFIG_T::n_in + i;
-        } else {
-            norm_index = mask_index * CONFIG_T::n_filt + i % CONFIG_T::n_filt;
-        }
         typename data_T::value_type zero = 0;
-        res[i] = (weights[norm_index]) ? data[i] : zero;
+        res[i] = (weights[mask_index * CONFIG_T::n_filt + i % CONFIG_T::n_filt]) ? data[i] : zero;
         // std::cout << "data[" << i << "]: " << data[i] << " weights: " << weights[norm_index] << " filter: " << CONFIG_T::n_filt << " norm_index: " << norm_index << std::endl;
     }
 
