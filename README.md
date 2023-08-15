@@ -56,3 +56,32 @@ hls_model.build()
 #Print out the report if you want
 hls4ml.report.read_vivado_report('my-hls-test')
 ```
+
+# How to add custom layer
+There are 2 ways to do this.
+
+## Approach 1: Use the extension API of hls4ml
+See https://fastmachinelearning.org/hls4ml/advanced/extension.html. 
+
+## Approach 2: Modify the hls4ml codebase directly 
+Suppose we want to add an **id** layer which outputs its input.
+1. **hls4ml/utils/config.py/config_from_keras_model**: Add the layer name in Keras to the supported layer list so that the parser recognizes our layer.
+```Python
+id_layers = ['ID']
+#All supported layers
+supported_layers = core_layers + dense_layers + conv_layers + pooling_layers + norm_layers + activation_layers + merge_layers + qkeras_layers + upsampling_layers + reshaping_layers + graph_layers + rnn_layers + id_layers + skip_layers
+```
+2. **hls4ml/converters/keras/**: Add the keras handler for our **id** layer. Create a new file called id.py. The handler file will be automatically registered and used during parsing.
+```Python
+import math
+from hls4ml.converters.keras_to_hls import parse_default_keras_layer
+from hls4ml.converters.keras_to_hls import keras_handler
+
+@keras_handler('ID')
+def parse_id_layer(keras_layer, input_names, input_shapes, data_reader, config):
+    assert('ID' in keras_layer['class_name'])
+
+    layer = parse_default_keras_layer(keras_layer, input_names)
+    return layer, [shape for shape in input_shapes[0]]
+```
+3. 
