@@ -191,7 +191,7 @@ void id(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
 #endif
 
 ```
-This is nnet_id_stream.h
+This is nnet_id_stream.h.
 ```C++
 #ifndef NNET_ID_STREAM_H_
 #define NNET_ID_STREAM_H_
