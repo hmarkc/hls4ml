@@ -64,14 +64,17 @@ There are 2 ways to do this.
 See https://fastmachinelearning.org/hls4ml/advanced/extension.html. 
 
 ## Approach 2: Modify the hls4ml codebase directly 
+hls4ml is kind of like a compiler. It has a frontend for parsing and a backend for code generation. 
 Suppose we want to add an **id** layer which outputs its input.
-1. **hls4ml/utils/config.py/config_from_keras_model**: Add the layer name in Keras to the supported layer list so that the parser recognizes our layer.
+1. **hls4ml/utils/config.py/config_from_keras_model**:
+Add the layer name in Keras to the supported layer list so that the parser recognizes our layer.
 ```Python
 id_layers = ['ID']
 #All supported layers
 supported_layers = core_layers + dense_layers + conv_layers + pooling_layers + norm_layers + activation_layers + merge_layers + qkeras_layers + upsampling_layers + reshaping_layers + graph_layers + rnn_layers + id_layers + skip_layers
 ```
-2. **hls4ml/converters/keras/**: Add the keras handler for our **id** layer. Create a new file called id.py. The handler file will be automatically registered and used during parsing.
+2. **hls4ml/converters/keras/**:
+Add the keras handler for our **id** layer. Create a new file called id.py. The handler file will be automatically registered and used during parsing.
 ```Python
 import math
 from hls4ml.converters.keras_to_hls import parse_default_keras_layer
@@ -84,4 +87,163 @@ def parse_id_layer(keras_layer, input_names, input_shapes, data_reader, config):
     layer = parse_default_keras_layer(keras_layer, input_names)
     return layer, [shape for shape in input_shapes[0]]
 ```
-3. 
+3. **hls4ml/model/layers.py**:
+Add the IR object for our parsed layer. 
+```Python
+class ID(Layer):
+    _expected_attributes = [
+        Attribute('n_in')
+    ]
+
+    def initialize(self):
+        inp = self.get_input_variable()
+        shape = inp.shape
+        dims = inp.dim_names
+        self.add_output_variable(shape, dims)
+        self.set_attr('n_in', self.get_input_variable().size())
+```
+Add it to the layer_map.
+```Python
+layer_map = {
+    'Input' : Input,
+           ...
+    'ID'    : ID,
+}
+```
+4. **hls4ml/backends/vivado/pass/**:
+Also add an **id_template.py** file to register our pass to the backend.
+```Python
+from hls4ml.backends.backend import get_backend
+from hls4ml.model.layers import ID
+from hls4ml.backends.template import LayerConfigTemplate, FunctionCallTemplate
+
+# ID template
+
+id_config_template = """
+struct config{index} : nnet::id_config {{
+    static const unsigned n_in = {n_in};
+    static const unsigned io_type = nnet::{iotype};
+}};\n"""
+
+id_function_template = 'nnet::id<{input_t}, {output_t}, {config}>({input}, {output});'
+
+id_include_list = ['nnet_utils/nnet_id.h', 'nnet_utils/nnet_id_stream.h']
+
+class IDConfigTemplate(LayerConfigTemplate):
+    def __init__(self):
+        super().__init__(ID)
+        self.template = id_config_template
+
+    def format(self, node):
+        params = self._default_config_params(node)
+
+        return self.template.format(**params)
+
+class IDFunctionTemplate(FunctionCallTemplate):
+    def __init__(self):
+        super().__init__(ID, include_header=id_include_list)
+        self.template = id_function_template
+
+    def format(self, node):
+        params = self._default_function_params(node)
+
+        return self.template.format(**params)
+```
+5. **hls4ml/templates/vivado/nnet_utils/**:
+Add 2 template files(1 for stream, 1 for parallel) for the generation the HLS code of our layer.
+
+This is nnet_id.h.
+```C++
+#ifndef NNET_ID_H_
+#define NNET_ID_H_
+
+#include "ap_fixed.h"
+#include "nnet_common.h"
+#include <cmath>
+#include <random>
+#include <stdint.h>
+
+namespace nnet {
+
+struct id_config
+{
+    // IO size
+    static const unsigned n_in = 10;
+
+    // Resource reuse info
+    static const unsigned io_type = io_parallel;
+    static const unsigned reuse_factor = 1;
+};
+
+// *************************************************
+//       ID
+// *************************************************
+template<class data_T, class res_T, typename CONFIG_T>
+void id(data_T data[CONFIG_T::n_in], res_T res[CONFIG_T::n_in])
+{
+  #pragma HLS PIPELINE
+  for (int ii = 0; ii < CONFIG_T::n_in; ii++) { 
+    res[ii] = data[ii];
+  }
+}
+}
+
+#endif
+
+```
+This is nnet_id_stream.h
+```C++
+#ifndef NNET_ID_STREAM_H_
+#define NNET_ID_STREAM_H_
+
+#include <cmath>
+#include "ap_fixed.h"
+#include "hls_stream.h"
+#include "nnet_common.h"
+#include "nnet_types.h"
+#include "nnet_stream.h"
+#include "nnet_id.h"
+
+namespace nnet {
+
+// *************************************************
+//       ID
+// *************************************************
+template<class data_T, class res_T, typename CONFIG_T>
+void id(hls::stream<data_T> &data_stream, hls::stream<res_T> &res_stream) {
+
+    typename data_T::value_type data[CONFIG_T::n_in];
+    #pragma HLS ARRAY_PARTITION variable=data complete
+
+    typename res_T::value_type res[CONFIG_T::n_in];
+    #pragma HLS ARRAY_PARTITION variable=res complete
+
+    DataPrepare: for(int i_in = 0; i_in < CONFIG_T::n_in / data_T::size; i_in++) {
+        if (CONFIG_T::n_in / data_T::size > 1) {
+            #pragma HLS PIPELINE
+        }
+        data_T data_pack = data_stream.read();
+        DataPack: for (int i_pack = 0; i_pack < data_T::size; i_pack++) {
+            #pragma HLS UNROLL
+            data[i_in * data_T::size + i_pack] = data_pack[i_pack];
+        }
+    }
+
+    ResWrite: for(unsigned i_out = 0; i_out < CONFIG_T::n_in / res_T::size; i_out++) {
+        if (CONFIG_T::n_in / res_T::size > 1) {
+            #pragma HLS PIPELINE
+        }
+        res_T res_pack;
+        #pragma HLS DATA_PACK variable=res_pack
+        ResPack: for (int i_pack = 0; i_pack < res_T::size; i_pack++) {
+            #pragma HLS UNROLL
+            res_pack[i_pack] = data[i_out * res_T::size + i_pack];
+        }
+        res_stream.write(res_pack);
+    }
+}
+}
+
+#endif
+```
+
